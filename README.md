@@ -4,6 +4,9 @@ Cyberverse Engine platform library. It owns the operating-system-facing parts of
 the engine — windows, raw input, frame timing, and key mapping — and exposes the
 native window handle that the renderer needs.
 
+See [docs/roadmap.md](docs/roadmap.md) for planned work and open design
+questions.
+
 ## Backends
 
 - **GLFW** (`backends/glfw`) — real windows through GLFW 3.4. Windows are created
@@ -86,6 +89,7 @@ src/cyberverse/platform/
   backends/glfw/                               GLFW platform/window/error/native helpers
   backends/glfw/macos/window.mm                CAMetalLayer setup for MoltenVK
   backends/headless/                           headless platform/window with event injection
+docs/roadmap.md                                development roadmap (Chinese)
 ```
 
 ## Build and test
