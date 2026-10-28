@@ -96,6 +96,8 @@ void window::set_resize_callback(window_resize_event_handler handler) noexcept {
 
 const raw_input_state& window::input_state() const noexcept { return input_; }
 
+void window::set_ime_caret(const ime_caret& caret) noexcept { ime_caret_ = caret; }
+
 void window::key_callback(GLFWwindow* handle, int key, int scancode, int action, int mods) {
   (void)scancode;
 

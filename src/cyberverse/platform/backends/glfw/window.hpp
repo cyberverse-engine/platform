@@ -63,6 +63,8 @@ public:
 
   const raw_input_state& input_state() const noexcept override;
 
+  void set_ime_caret(const ime_caret& caret) noexcept override;
+
 private:
   static void key_callback(GLFWwindow* handle, int key, int scancode, int action, int mods);
   static void char_callback(GLFWwindow* handle, unsigned int codepoint);
@@ -83,6 +85,7 @@ private:
   GLFWwindow* handle_ = nullptr;
   native_window_handle native_handle_{};
   raw_input_state input_;
+  ime_caret ime_caret_{};
   window_resize_event_handler resize_callback_;
   cursor_mode cursor_mode_ = cursor_mode::normal;
   glm::vec2 framebuffer_scale_{ 1.0f, 1.0f };

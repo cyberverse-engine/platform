@@ -64,6 +64,9 @@ while (!window->should_close()) {
   `is_released()` are per-frame edges. Mouse and scroll deltas and text input are
   per-frame too.
 - Key mappings require an exact modifier set; caps lock and num lock are ignored.
+- `window::set_ime_caret()` reports the focused text caret rectangle (logical
+  window content coordinates) for platform IME candidate placement. The default
+  implementation is a no-op; headless windows store the latest value for tests.
 - `window_config.width` / `height` are the logical client size.
   `window::width()` / `height()` are framebuffer pixels, and
   `framebuffer_scale()` is pixels divided by logical size.

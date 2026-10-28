@@ -62,6 +62,17 @@ struct native_window_handle {
 using window_resize_event_handler = std::function<void(int, int)>;
 
 /**
+ * @brief IME caret rectangle in logical window content coordinates
+ *
+ */
+struct ime_caret {
+  float x = 0.0f;
+  float y = 0.0f;
+  float height = 0.0f;
+  bool visible = false;
+};
+
+/**
  * @brief Window base class
  *
  * A window owns its input state and keeps the platform alive through a release
@@ -180,6 +191,17 @@ public:
    * @return const raw_input_state&
    */
   [[nodiscard]] virtual const raw_input_state& input_state() const noexcept = 0;
+
+  /**
+   * @brief Report the text caret for platform IME candidate placement
+   *
+   * Backends that do not implement IME positioning may ignore this. The
+   * coordinates are logical window content coordinates; visible is false when
+   * no text widget wants IME input.
+   *
+   * @param caret Caret rectangle
+   */
+  virtual void set_ime_caret(const ime_caret& caret) noexcept { (void)caret; }
 };
 
 } // namespace platform

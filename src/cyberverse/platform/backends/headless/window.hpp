@@ -70,6 +70,14 @@ public:
 
   const raw_input_state& input_state() const noexcept override;
 
+  void set_ime_caret(const ime_caret& caret) noexcept override;
+
+  /**
+   * @brief Latest IME caret reported by the application
+   *
+   */
+  [[nodiscard]] ime_caret last_ime_caret() const noexcept { return ime_caret_; }
+
   /**
    * @brief Queue a key press
    *
@@ -161,6 +169,7 @@ private:
   detail::release_guard release_;
   native_window_handle native_handle_{};
   raw_input_state input_;
+  ime_caret ime_caret_{};
   window_resize_event_handler resize_callback_;
   cursor_mode cursor_mode_ = cursor_mode::normal;
   std::vector<std::function<void()>> pending_events_;

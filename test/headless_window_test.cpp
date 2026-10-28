@@ -115,6 +115,21 @@ TEST_CASE("headless focus loss releases held input", "[headless][window]") {
   CHECK(window->input_state().is_key_released(key_id::key_w));
 }
 
+TEST_CASE("headless window records the IME caret", "[headless][window][ime]") {
+  auto window = make_headless_window();
+  REQUIRE(window != nullptr);
+
+  window->set_ime_caret(ime_caret{ 12.0f, 34.0f, 22.0f, true });
+  const ime_caret caret = window->last_ime_caret();
+  CHECK(caret.x == Catch::Approx(12.0f));
+  CHECK(caret.y == Catch::Approx(34.0f));
+  CHECK(caret.height == Catch::Approx(22.0f));
+  CHECK(caret.visible);
+
+  window->set_ime_caret(ime_caret{});
+  CHECK_FALSE(window->last_ime_caret().visible);
+}
+
 TEST_CASE("windows keep their platform alive", "[headless][window][lifetime]") {
   auto host = make_platform(backend_type::headless);
   auto window = host->create_window(window_config{});

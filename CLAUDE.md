@@ -81,6 +81,9 @@ ctest --test-dir /tmp/cyberverse-platform-test --output-on-failure
 
 ## Windows and timing
 
+- `window::set_ime_caret()` is the optional IME caret sink. UI code owns the
+  caret computation; backends may ignore it. Headless windows record the latest
+  value for deterministic tests.
 - `window_config.width` / `height` are the logical client size. `window::width()` / `height()` are the
   framebuffer size in pixels; `framebuffer_scale()` is framebuffer pixels divided by logical size.
   Headless windows are always 1:1.
