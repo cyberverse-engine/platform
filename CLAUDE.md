@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `platform` is the standalone platform module of Cyberverse Engine: C++23, GLM, built as the static
 library `cyberverse::platform::static_lib`. It provides windows, raw input, frame timing, key mapping,
-and native window handles. It does **not** create a graphics device or swap chain; the renderer consumes
+native window handles, and best-effort system/process information. It does **not** create a graphics device or swap chain; the renderer consumes
 `native_window_handle` and owns rendering.
 
 Dependencies: GLM 1.0.1 (always) and GLFW 3.4 (when the GLFW backend is enabled), both fetched by CMake.
@@ -78,6 +78,14 @@ ctest --test-dir /tmp/cyberverse-platform-test --output-on-failure
 - Headless windows queue events and dispatch them in order during `poll_events()`, after
   `begin_frame()`. This ordering is what makes `inject_*` + `poll_events()` produce the same edges as
   native events.
+
+## System information
+
+`platform::platform::query_system_info()`, `query_memory_info()`, `query_process_info()`, and
+`query_cpu_times()` are non-virtual base methods implemented by `system_info.cpp`; they do not depend on the selected backend.
+OS-specific code is guarded by `__APPLE__`, `__linux__`, and `_WIN32`; Windows links `psapi` and
+`advapi32`. Fields are best effort (empty/zero/`std::nullopt` when unavailable), and the queries are thread-safe. Keep
+new OS code in `system_info.cpp` rather than backends.
 
 ## Windows and timing
 

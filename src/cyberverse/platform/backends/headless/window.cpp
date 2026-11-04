@@ -10,6 +10,7 @@
  */
 #include "cyberverse/platform/backends/headless/window.hpp"
 
+#include <algorithm>
 #include <utility>
 
 namespace cyberverse::platform::backends::headless {
@@ -65,6 +66,16 @@ void window::set_resize_callback(window_resize_event_handler handler) noexcept {
 const raw_input_state& window::input_state() const noexcept { return input_; }
 
 void window::set_ime_caret(const ime_caret& caret) noexcept { ime_caret_ = caret; }
+
+void window::set_clipboard_text(std::string_view text) { clipboard_ = text; }
+
+void window::inject_ime_composition(std::string_view text, std::size_t cursor) {
+  ime_state_.text = text;
+  ime_state_.cursor = std::min(cursor, ime_state_.text.size());
+  ime_state_.active = !ime_state_.text.empty();
+}
+
+void window::clear_ime_composition() { ime_state_ = {}; }
 
 void window::inject_key_down(key_id key) {
   queue([this, key] {
@@ -124,6 +135,7 @@ void window::inject_text(std::string_view text) {
 void window::inject_focus_lost() {
   queue([this] {
     input_.release_all();
+    ime_state_ = {};
   });
 }
 

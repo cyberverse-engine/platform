@@ -1,8 +1,8 @@
 # platform
 
 Cyberverse Engine platform library. It owns the operating-system-facing parts of
-the engine — windows, raw input, frame timing, and key mapping — and exposes the
-native window handle that the renderer needs.
+the engine — windows, raw input, frame timing, key mapping, and system/process
+information — and exposes the native window handle that the renderer needs.
 
 See [docs/roadmap.md](docs/roadmap.md) for planned work and open design
 questions.
@@ -67,6 +67,12 @@ while (!window->should_close()) {
 - `window::set_ime_caret()` reports the focused text caret rectangle (logical
   window content coordinates) for platform IME candidate placement. The default
   implementation is a no-op; headless windows store the latest value for tests.
+- `window::get_ime_state()` returns the active platform IME preedit. GLFW on
+  macOS captures marked text from the native `NSTextInputClient` bridge; headless
+  windows expose `inject_ime_composition()` for deterministic tests.
+- `window::clipboard_text()` / `set_clipboard_text()` expose the platform
+  clipboard. GLFW uses the GLFW clipboard API; headless windows use an in-memory
+  clipboard.
 - `window_config.width` / `height` are the logical client size.
   `window::width()` / `height()` are framebuffer pixels, and
   `framebuffer_scale()` is pixels divided by logical size.
@@ -75,6 +81,33 @@ while (!window->should_close()) {
   safely outlive the caller's platform reference.
 - GLFW calls must happen on the main thread. Poll one window per application
   frame.
+
+## System information
+
+`platform::platform::query_system_info()`, `query_memory_info()`, and
+`query_process_info()` provide best-effort cross-platform information without
+tying it to a particular window backend:
+
+```cpp
+using namespace cyberverse::platform;
+
+auto host = make_platform(backend_type::headless);
+
+const system_info system = host->query_system_info();
+const memory_info memory = host->query_memory_info();
+const process_info process = host->query_process_info();
+const std::optional<cpu_times> cpu = host->query_cpu_times();
+
+// system.os_name, system.cpu_model, system.logical_core_count,
+// system.total_memory_bytes, memory.available_memory_bytes,
+// process.resident_bytes, process.virtual_bytes,
+// cpu->total_ticks / cpu->idle_ticks (cumulative counters)
+```
+
+`query_cpu_times()` returns cumulative counters; callers compute utilization from
+two snapshots. It is `std::nullopt` when the platform does not expose them.
+Unsupported fields are empty or zero. The queries are thread-safe and do not
+create windows or initialize a backend.
 
 ## Layout
 
@@ -87,10 +120,11 @@ src/cyberverse/platform/
   raw_input.hpp / .cpp                         key/mouse/text input state
   key_mapping.hpp / .cpp                       named actions over raw input
   timer.hpp / .cpp                             frame timer interface
+  system_info.hpp / .cpp                       cross-platform OS/CPU/memory/process info
   detail/frame_timer.hpp / .cpp                steady-clock timer shared by backends
   detail/release_guard.hpp                     platform lifetime guard
   backends/glfw/                               GLFW platform/window/error/native helpers
-  backends/glfw/macos/window.mm                CAMetalLayer setup for MoltenVK
+  backends/glfw/macos/window.mm                CAMetalLayer + NSTextInputClient IME bridge
   backends/headless/                           headless platform/window with event injection
 docs/roadmap.md                                development roadmap (Chinese)
 ```

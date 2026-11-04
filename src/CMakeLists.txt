@@ -45,6 +45,7 @@ set(
   cyberverse/platform/key_mapping.hpp
   cyberverse/platform/platform.hpp
   cyberverse/platform/raw_input.hpp
+  cyberverse/platform/system_info.hpp
   cyberverse/platform/timer.hpp
   cyberverse/platform/window.hpp
   cyberverse/platform/detail/frame_timer.hpp
@@ -61,6 +62,7 @@ set(
   cyberverse/platform/window.cpp
   cyberverse/platform/raw_input.cpp
   cyberverse/platform/key_mapping.cpp
+  cyberverse/platform/system_info.cpp
   cyberverse/platform/detail/frame_timer.cpp
   cyberverse/platform/backends/headless/platform.cpp
   cyberverse/platform/backends/headless/window.cpp
@@ -100,6 +102,10 @@ target_sources(cyberverse_platform_static_lib PUBLIC ${HEADER_FILES})
 target_sources(cyberverse_platform_static_lib PRIVATE ${SOURCE_FILES})
 
 target_link_libraries(cyberverse_platform_static_lib PUBLIC glm::glm)
+
+if(WIN32)
+  target_link_libraries(cyberverse_platform_static_lib PRIVATE psapi advapi32)
+endif()
 
 if(CYBERVERSE_PLATFORM_BACKEND_GLFW)
   target_link_libraries(cyberverse_platform_static_lib PUBLIC glfw)

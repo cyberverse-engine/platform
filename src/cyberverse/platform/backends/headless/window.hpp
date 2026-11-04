@@ -72,6 +72,12 @@ public:
 
   void set_ime_caret(const ime_caret& caret) noexcept override;
 
+  ime_state get_ime_state() const override { return ime_state_; }
+
+  std::string clipboard_text() const override { return clipboard_; }
+
+  void set_clipboard_text(std::string_view text) override;
+
   /**
    * @brief Latest IME caret reported by the application
    *
@@ -146,6 +152,19 @@ public:
   void inject_text(std::string_view text);
 
   /**
+   * @brief Set the active IME composition state
+   *
+   * @param text UTF-8 preedit text
+   * @param cursor UTF-8 byte offset into text
+   */
+  void inject_ime_composition(std::string_view text, std::size_t cursor);
+
+  /**
+   * @brief Clear the active IME composition
+   */
+  void clear_ime_composition();
+
+  /**
    * @brief Queue a focus loss
    *
    * Releases every held key and mouse button on the next poll.
@@ -170,6 +189,8 @@ private:
   native_window_handle native_handle_{};
   raw_input_state input_;
   ime_caret ime_caret_{};
+  ime_state ime_state_{};
+  std::string clipboard_{};
   window_resize_event_handler resize_callback_;
   cursor_mode cursor_mode_ = cursor_mode::normal;
   std::vector<std::function<void()>> pending_events_;

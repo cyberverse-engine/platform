@@ -11,6 +11,9 @@
 #pragma once
 
 #include <functional>
+#include <string>
+#include <string_view>
+#include <utility>
 
 #include "cyberverse/platform/backends/glfw/glfw.hpp"
 #include "cyberverse/platform/backends/glfw/native.hpp"
@@ -65,6 +68,19 @@ public:
 
   void set_ime_caret(const ime_caret& caret) noexcept override;
 
+  ime_state get_ime_state() const override { return ime_state_; }
+
+  std::string clipboard_text() const override;
+
+  void set_clipboard_text(std::string_view text) override;
+
+  /**
+   * @brief Update the IME composition captured by the native macOS bridge
+   */
+  void set_ime_composition(ime_state state) { ime_state_ = std::move(state); }
+
+  [[nodiscard]] ime_caret get_ime_caret() const noexcept { return ime_caret_; }
+
 private:
   static void key_callback(GLFWwindow* handle, int key, int scancode, int action, int mods);
   static void char_callback(GLFWwindow* handle, unsigned int codepoint);
@@ -86,6 +102,7 @@ private:
   native_window_handle native_handle_{};
   raw_input_state input_;
   ime_caret ime_caret_{};
+  ime_state ime_state_{};
   window_resize_event_handler resize_callback_;
   cursor_mode cursor_mode_ = cursor_mode::normal;
   glm::vec2 framebuffer_scale_{ 1.0f, 1.0f };

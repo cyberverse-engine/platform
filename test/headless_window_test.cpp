@@ -130,6 +130,38 @@ TEST_CASE("headless window records the IME caret", "[headless][window][ime]") {
   CHECK_FALSE(window->last_ime_caret().visible);
 }
 
+TEST_CASE("headless window stores IME composition", "[headless][window][ime]") {
+  auto window = make_headless_window();
+  REQUIRE(window != nullptr);
+
+  window->inject_ime_composition("\xE4\xBD\xA0\xE5\xA5\xBD", 3);
+  ime_state state = window->get_ime_state();
+  CHECK(state.active);
+  CHECK(state.text == "\xE4\xBD\xA0\xE5\xA5\xBD");
+  CHECK(state.cursor == 3);
+
+  window->inject_focus_lost();
+  window->poll_events();
+  CHECK_FALSE(window->get_ime_state().active);
+  CHECK(window->get_ime_state().text.empty());
+
+  window->inject_ime_composition("a", 99);
+  CHECK(window->get_ime_state().cursor == 1);
+  window->clear_ime_composition();
+  CHECK_FALSE(window->get_ime_state().active);
+}
+
+TEST_CASE("headless window stores clipboard text", "[headless][window][clipboard]") {
+  auto window = make_headless_window();
+  REQUIRE(window != nullptr);
+
+  CHECK(window->clipboard_text().empty());
+  window->set_clipboard_text("hello");
+  CHECK(window->clipboard_text() == "hello");
+  window->set_clipboard_text("");
+  CHECK(window->clipboard_text().empty());
+}
+
 TEST_CASE("windows keep their platform alive", "[headless][window][lifetime]") {
   auto host = make_platform(backend_type::headless);
   auto window = host->create_window(window_config{});

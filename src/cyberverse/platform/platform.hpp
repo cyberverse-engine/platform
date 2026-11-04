@@ -14,6 +14,7 @@
 #include <span>
 
 #include "cyberverse/platform/backend.hpp"
+#include "cyberverse/platform/system_info.hpp"
 #include "cyberverse/platform/timer.hpp"
 #include "cyberverse/platform/window.hpp"
 
@@ -42,6 +43,37 @@ public:
    * @return backend_type
    */
   [[nodiscard]] virtual backend_type backend_type() const noexcept = 0;
+
+  /**
+   * @brief Query static-ish host system information.
+   *
+   * The query is best effort and thread-safe. Unsupported fields are left empty
+   * or zero. The platform instance only supplies the abstraction; the data is
+   * independent of the selected backend.
+   */
+  [[nodiscard]] system_info query_system_info() const;
+
+  /**
+   * @brief Query currently available physical memory.
+   *
+   * The query is best effort and thread-safe.
+   */
+  [[nodiscard]] memory_info query_memory_info() const;
+
+  /**
+   * @brief Query this process's resident and virtual memory usage.
+   *
+   * The query is best effort and thread-safe.
+   */
+  [[nodiscard]] process_info query_process_info() const;
+
+  /**
+   * @brief Query cumulative CPU time counters.
+   *
+   * The query is best effort and thread-safe. Returns nullopt when the platform
+   * does not expose CPU time counters.
+   */
+  [[nodiscard]] std::optional<cpu_times> query_cpu_times() const;
 
   /**
    * @brief Create a timer object

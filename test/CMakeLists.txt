@@ -16,9 +16,21 @@ add_executable(
   key_mapping_test.cpp
   timer_test.cpp
   platform_test.cpp
+  system_info_test.cpp
   headless_window_test.cpp
   glfw_window_test.cpp
 )
+
+if(APPLE AND CYBERVERSE_PLATFORM_BACKEND_GLFW)
+  enable_language(OBJCXX)
+  target_sources(cyberverse_platform_tests PRIVATE glfw_ime_test.mm)
+  set_source_files_properties(
+    glfw_ime_test.mm
+    PROPERTIES
+      LANGUAGE OBJCXX
+      COMPILE_OPTIONS "-fobjc-arc"
+  )
+endif()
 
 target_link_libraries(
   cyberverse_platform_tests

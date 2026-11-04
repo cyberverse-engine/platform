@@ -13,6 +13,10 @@
 #include <system_error>
 #include <utility>
 
+#if defined(__APPLE__)
+#include "cyberverse/platform/backends/glfw/macos/window.hpp"
+#endif
+
 namespace cyberverse::platform::backends::glfw {
 
 static_assert(static_cast<int>(mod_keys::shift) == GLFW_MOD_SHIFT);
@@ -41,6 +45,9 @@ window::window(const window_config& config, window_release_handler release_callb
   install_callbacks();
   refresh_size();
   native_handle_ = query_native_handle(handle_);
+#if defined(__APPLE__)
+  install_ime_bridge(handle_, this);
+#endif
 }
 
 window::~window() {
@@ -97,6 +104,22 @@ void window::set_resize_callback(window_resize_event_handler handler) noexcept {
 const raw_input_state& window::input_state() const noexcept { return input_; }
 
 void window::set_ime_caret(const ime_caret& caret) noexcept { ime_caret_ = caret; }
+
+std::string window::clipboard_text() const {
+  if (handle_ == nullptr) {
+    return {};
+  }
+  const char* text = glfwGetClipboardString(handle_);
+  return text != nullptr ? std::string{ text } : std::string{};
+}
+
+void window::set_clipboard_text(std::string_view text) {
+  if (handle_ == nullptr) {
+    return;
+  }
+  const std::string owned{ text };
+  glfwSetClipboardString(handle_, owned.c_str());
+}
 
 void window::key_callback(GLFWwindow* handle, int key, int scancode, int action, int mods) {
   (void)scancode;
@@ -180,6 +203,7 @@ void window::window_focus_callback(GLFWwindow* handle, int focused) {
   auto* owner = self(handle);
   if (owner != nullptr && focused == GLFW_FALSE) {
     owner->input_.release_all();
+    owner->ime_state_ = {};
   }
 }
 

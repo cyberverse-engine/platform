@@ -14,5 +14,6 @@
 #include "cyberverse/platform/key_mapping.hpp"
 #include "cyberverse/platform/platform.hpp"
 #include "cyberverse/platform/raw_input.hpp"
+#include "cyberverse/platform/system_info.hpp"
 #include "cyberverse/platform/timer.hpp"
 #include "cyberverse/platform/window.hpp"

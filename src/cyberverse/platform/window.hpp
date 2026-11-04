@@ -10,8 +10,10 @@
  */
 #pragma once
 
+#include <cstddef>
 #include <functional>
 #include <string>
+#include <string_view>
 
 #include <glm/vec2.hpp>
 
@@ -70,6 +72,20 @@ struct ime_caret {
   float y = 0.0f;
   float height = 0.0f;
   bool visible = false;
+};
+
+/**
+ * @brief Platform IME composition (preedit) state
+ *
+ * `text` is UTF-8 preedit text that has not been committed to the text field.
+ * `cursor` is a UTF-8 byte offset into `text`. `active` is false when no IME
+ * composition is in progress.
+ *
+ */
+struct ime_state {
+  std::string text;
+  std::size_t cursor = 0;
+  bool active = false;
 };
 
 /**
@@ -202,6 +218,29 @@ public:
    * @param caret Caret rectangle
    */
   virtual void set_ime_caret(const ime_caret& caret) noexcept { (void)caret; }
+
+  /**
+   * @brief Latest platform IME composition state
+   *
+   * Backends that do not expose preedit text return an inactive state.
+   *
+   * @return ime_state
+   */
+  [[nodiscard]] virtual ime_state get_ime_state() const { return {}; }
+
+  /**
+   * @brief Read the platform clipboard as UTF-8 text
+   *
+   * @return std::string
+   */
+  [[nodiscard]] virtual std::string clipboard_text() const { return {}; }
+
+  /**
+   * @brief Write UTF-8 text to the platform clipboard
+   *
+   * @param text UTF-8 text
+   */
+  virtual void set_clipboard_text(std::string_view text) { (void)text; }
 };
 
 } // namespace platform

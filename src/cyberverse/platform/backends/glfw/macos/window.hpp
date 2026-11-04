@@ -36,6 +36,17 @@ void* get_ns_window_view(GLFWwindow* window) noexcept;
  */
 void* get_metal_layer(GLFWwindow* window) noexcept;
 
+/**
+ * @brief Install the native NSTextInputClient bridge for a GLFW content view
+ *
+ * The bridge captures marked text for UI composition rendering and positions
+ * the IME candidate rectangle from the latest platform caret.
+ *
+ * @param window GLFW window
+ * @param owner GLFW window implementation
+ */
+void install_ime_bridge(GLFWwindow* window, void* owner) noexcept;
+
 } // namespace glfw
 } // namespace backends
 } // namespace platform
